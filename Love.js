@@ -36,8 +36,6 @@ vectorWatch.on('config', function(event, response) {
 vectorWatch.on('options', function(event, response) {
     // dynamic options for a specific setting name was requested
     logger.info('on options');
-    
-    return response;
 });
 
 vectorWatch.on('subscribe', function(event, response) {
@@ -123,7 +121,7 @@ function getRandomLoveMessage() {
         });
 
         var index = Math.floor(Math.random() * loveMessages.length);
-        returnedMessage = loveMessages[index];
+        returnedMessage = loveMessages[index].replace(/love|aime/gi, String.fromCharCode(0xe033));
     } catch(err) {
         logger.error('Error while getting random love message');
     }
