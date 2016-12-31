@@ -2,7 +2,6 @@
 
 var useConfig = true;
 
-var request = require('request');
 var StorageProvider = require('vectorwatch-storageprovider');
 var VectorWatch = require('vectorwatch-sdk');
 
