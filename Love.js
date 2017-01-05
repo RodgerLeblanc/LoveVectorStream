@@ -93,6 +93,13 @@ vectorWatch.on('subscribe', function(event, response) {
         }
         cloudantDbDocument.messages[key]["userKey"] = event.req.body.userKey;
 
+        var banned = cloudantDbDocument.banned;
+        if (banned.some(function(e, i, a) { return e === key; })) {
+            response.setValue('-Banned-');
+        	response.send();
+	        return;
+        }
+        
         var messageFromUserSettings = event.userSettings.settings.Message.name;
         var messageFromCloudant = cloudantDbDocument.messages[key].message;
         if (messageFromUserSettings !== messageFromCloudant) {
@@ -164,6 +171,12 @@ function updateStreamForEveryRecord(records, forceUpdate) {
             if (!cloudantDbDocument.messages[key] || !cloudantDbDocument.messages[key].lastUpdateTime) {
                 cloudantDbDocument.messages[key] = JSON.parse('{"lastUpdateTime":0}');
             }
+            
+            var banned = cloudantDbDocument.banned;
+            if (banned.some(function(e, i, a) { return e === key; })) {
+                record.pushUpdate('-Banned-');
+                return;
+            }
 
             var userSettings = record.userSettings;
             var updateTimeInMs = parseInt(userSettings.Update.name) * 60 * 1000 - (10 * 1000); // 10 secs margin
@@ -186,7 +199,7 @@ function getRandomLoveMessage() {
         var keys = Object.keys(cloudantDbDocument.messages);
         var randomIndex = Math.floor(Math.random() * keys.length);
         var key = keys[randomIndex];
-        returnedMessage = cloudantDbDocument.messages[key].message.replace(/love|aime/gi, String.fromCharCode(0xe033));
+        returnedMessage = cloudantDbDocument.messages[key].message.replace(/love|heart|aime|coeur/gi, String.fromCharCode(0xe033));
     } catch(err) {
         logger.error('Error while getting random love message');
     }
