@@ -168,8 +168,12 @@ function updateStreamForEveryRecord(records, forceUpdate) {
         try {
             logger.info('record: ' + JSON.stringify(record));
             var key = record.channelLabel;
-            if (!cloudantDbDocument.messages[key] || !cloudantDbDocument.messages[key].lastUpdateTime) {
-                cloudantDbDocument.messages[key] = JSON.parse('{"lastUpdateTime":0}');
+            if (!cloudantDbDocument.messages[key] || cloudantDbDocument.messages[key].lastUpdateTime === undefined) {
+                var messageObject = {};
+                messageObject['message'] = record.userSettings.Message.name;
+                messageObject['lastUpdateTime'] = 0;
+                messageObject['userKey'] = key;
+                cloudantDbDocument.messages[key] = messageObject;
             }
             
             var banned = cloudantDbDocument.banned;
@@ -197,9 +201,14 @@ function getRandomLoveMessage() {
     var returnedMessage;
     try {
         var keys = Object.keys(cloudantDbDocument.messages);
+        logger.info('keys: ' + JSON.stringify(keys));
         var randomIndex = Math.floor(Math.random() * keys.length);
+        logger.info('randomIndex: ' + randomIndex);
         var key = keys[randomIndex];
+        logger.info('key: ' + key);
+        logger.info('cloudantDbDocument: ' + JSON.stringify(cloudantDbDocument));
         returnedMessage = cloudantDbDocument.messages[key].message.replace(/love|heart|aime|coeur/gi, String.fromCharCode(0xe033));
+        logger.info('returnedMessage: ' + returnedMessage);
     } catch(err) {
         logger.error('Error while getting random love message');
     }
