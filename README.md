@@ -16,4 +16,4 @@ Requirements :</br>
 </code> with your own database url.</br>
 8) Change <code>apiKeyUser</code> and <code>apiKeyPassword</code> with the API key and password you noted at step 3.</br>
 9) In VectorWatch online stream builder, take note of your stream UUID shown in the URL.</br>
-10) In CLoudant dashboard, create a new document in your database and name it exactly as your stream UUID.</br>
+10) In Cloudant dashboard, create a new document in your database and name it exactly as your stream UUID.</br>
