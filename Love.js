@@ -10,6 +10,10 @@ var vectorWatch = new VectorWatch();
 var logger = vectorWatch.logger;
 
 var cloudantUrl = 'your_own_cloudant_database_url' + process.env.STREAM_UUID;
+var apiKeyUser = 'some_api_key';
+var apiKeyPassword = 'some_api_password';
+var apiKeyAuth = "Basic " + btoa(apiKeyUser + ":" + apiKeyPassword);
+
 var cloudantDbDocument = {};
 
 if (!cloudantDbDocument.messages) {
@@ -201,9 +205,14 @@ function getRandomLoveMessage() {
     var returnedMessage;
     try {
         var keys = Object.keys(cloudantDbDocument.messages);
+        logger.info('keys: ' + JSON.stringify(keys));
         var randomIndex = Math.floor(Math.random() * keys.length);
+        logger.info('randomIndex: ' + randomIndex);
         var key = keys[randomIndex];
+        logger.info('key: ' + key);
+        logger.info('cloudantDbDocument: ' + JSON.stringify(cloudantDbDocument));
         returnedMessage = cloudantDbDocument.messages[key].message.replace(/love|heart|aime|coeur/gi, String.fromCharCode(0xe033));
+        logger.info('returnedMessage: ' + returnedMessage);
     } catch(err) {
         logger.error('Error while getting random love message');
     }
@@ -213,7 +222,12 @@ function getRandomLoveMessage() {
 
 function getCloudantDbDocument() {
     return new Promise(function(resolve, reject) {
-        request(cloudantUrl, function(error, httpResponse, body) {
+        request.get({
+            url: cloudantUrl, 
+            headers: {
+                'Authorization': apiKeyAuth
+            }
+        }, function(error, httpResponse, body) {
             if (error) {
                 reject('Error calling ' + cloudantUrl + ': ' + error.message);
                 return;
@@ -239,6 +253,9 @@ function updateCloudantDb() {
     return new Promise(function(resolve, reject) {
         request.put({
             url: cloudantUrl,
+            headers: {
+                'Authorization': apiKeyAuth
+            },
             body: JSON.stringify(cloudantDbDocument)
         }, function(error, httpResponse, body) {
             if (error) {
